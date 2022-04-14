@@ -1,17 +1,17 @@
 <template>
     <div class="row">
-        <div class="col w15" style="font-weight: 600;">Фильтр:</div>
+        <div class="col w15" style="font-weight: 600;">Создать:</div>
         <div class="col w85">
             <div class="row mb15">
                 <FilterInput
                     :input-value="data.country"
                     :label="`Страна`"
-                    :options="countryOptions"
+                    type="text"
                 />
                 <FilterInput
                     :input-value="data.city"
                     :label="`Город`"
-                    :options="cityOptions"
+                    type="text"
                     class="mla"
                 />
             </div>
@@ -19,24 +19,18 @@
                 <FilterInput
                     :input-value="data.rooms"
                     :label="`Комнаты`"
-                    :options="roomsOptions"
-                />
-            </div>
-            <div class="row mb15">
-                <FilterInput
-                    :input-value="data.rooms"
-                    :label="`Дата от`"
-                    type="date"
+                    type="text"
+
                 />
                 <FilterInput
                     :input-value="data.rooms"
-                    :label="`Дата до`"
-                    type="date"
+                    :label="`Рейтинг`"
+                    type="text"
                     class="mla"
                 />
             </div>
             <div class="row" style="justify-content: flex-end;">
-                <Button>Поиск</Button>
+                <Button>Создать</Button>
             </div>
         </div>
     </div>
@@ -54,6 +48,7 @@ const data = {
     country: "",
     city: "",
     rooms: "",
+    rate: 0
 };
 </script>
 

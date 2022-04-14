@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
+import { RouterLink, RouterView, useRouter } from "vue-router";
+import { store as _store } from "./stores/store";
+
+const store = _store();
+const router = useRouter();
+
+if (localStorage.getItem("login") == 'true') {
+    store.login();
+}
+
 </script>
 
 <template>

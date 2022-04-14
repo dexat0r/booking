@@ -6,19 +6,29 @@
         </div>
         <div class="row">
             <div class="title-wrap">
-                <span class="title">Booking.com</span>
+                <router-link class="title" to="/">Booking.com</router-link>
             </div>
+            <Button v-if="store.isLogin" @click="logout()" class="logout-btn">Выйти</Button>
         </div>
     </header>
 </template>
 
 <script lang="ts" setup>
+import { store as _store } from "@/stores/store";
+import Button from "@/components/Button.vue";
+import { RouterLink, useRouter } from "vue-router";
 
 interface Props {
     withGradient: boolean;
 }
+const store = _store();
+const router = useRouter();
 defineProps<Props>();
 
+const logout = () => {
+    store.logout();
+    router.push('/login')
+}
 </script>
 
 <style>
@@ -26,17 +36,19 @@ defineProps<Props>();
     font-size: 32px;
     line-height: 39px;
     font-weight: 600;
+    color: black;
+    text-decoration: none;
 }
+
 .gradient {
     position: relative;
     z-index: -1;
 }
+
 .gradient1 {
-    background: radial-gradient(
-        50% 50% at 50% 50%,
-        #d590ed 0%,
-        rgba(255, 255, 255, 0) 100%
-    );
+    background: radial-gradient(50% 50% at 50% 50%,
+            #d590ed 0%,
+            rgba(255, 255, 255, 0) 100%);
     position: absolute;
     width: 1051px;
     height: 1051px;
@@ -51,11 +63,9 @@ defineProps<Props>();
     left: -78px;
     top: -620px;
 
-    background: radial-gradient(
-        50% 50% at 50% 50%,
-        rgba(252, 202, 0, 0.4) 0%,
-        rgba(255, 255, 255, 0) 100%
-    );
+    background: radial-gradient(50% 50% at 50% 50%,
+            rgba(252, 202, 0, 0.4) 0%,
+            rgba(255, 255, 255, 0) 100%);
 }
 
 .gradient3 {
@@ -65,10 +75,12 @@ defineProps<Props>();
     left: 629px;
     top: 466px;
 
-    background: radial-gradient(
-        50% 50% at 50% 50%,
-        #fbff96 0%,
-        rgba(255, 255, 255, 0) 100%
-    );
+    background: radial-gradient(50% 50% at 50% 50%,
+            #fbff96 0%,
+            rgba(255, 255, 255, 0) 100%);
+}
+
+.logout-btn {
+    margin-left: auto;
 }
 </style>

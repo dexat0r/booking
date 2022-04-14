@@ -5,15 +5,20 @@
     flex-direction: row;
 }
 
+.col {
+    display: flex;
+    flex-direction: column;
+}
+
 html {
     font-family: 'Montserrat', sans-serif;
     box-sizing: border-box;
-    height: 100vh;
+    height: 98vh;
 }
 
 body {
     margin: 0;
-    padding: 0;
+    padding: 10px;
     height: 100%;
 }
 

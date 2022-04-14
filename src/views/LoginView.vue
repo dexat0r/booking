@@ -13,7 +13,14 @@ import Form from "@/components/Form.vue";
 <style>
 .login-form {
     margin: 0 auto;
-    justify-self: center;
-    align-self: center;
+    position: relative;
+    top: 40%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+.login-wrap {
+    height: 100%;
 }
 </style>

@@ -8,29 +8,21 @@
                 <template v-for="item in options[currentType].body">
                     <div class="form-row">
                         <label class="form-label">{{ item.label }}</label>
-                        <input
-                            v-if="typeof(item.inputType) == 'string'"
-                            :type="item.inputType"
-                            class="form-input"
-                            v-model="data[item.model]"
-                        />
+                        <input v-if="typeof (item.inputType) == 'string'" :type="item.inputType" class="form-input"
+                            v-model="data[item.model]" />
                         <select v-else class="form-input" v-model="data[item.model]">
-                            <option v-for="option in item.inputType" :value="option.value" :disabled="option?.disabled" :selected="option?.selected"> {{ option.option }} </option>
+                            <option v-for="option in item.inputType" :value="option.value" :disabled="option?.disabled"
+                                :selected="option?.selected"> {{ option.option }} </option>
                         </select>
                     </div>
                 </template>
             </div>
             <div class="form-footer">
-                <a
-                    :href="options[currentType].footer?.link"
-                    class="footer-link"
-                    @click="setType($event, options[currentType].footer.btnTypeSet)"
-                    >{{ options[currentType].footer?.linkText }}</a
-                >
-                <Button
-                    class="footer-btn"
-                    >{{ options[currentType].footer?.btn }}</Button
-                >
+                <a :href="options[currentType].footer?.link" class="footer-link"
+                    @click="setType($event, options[currentType].footer.btnTypeSet)">{{
+                        options[currentType].footer?.linkText
+                    }}</a>
+                <Button class="footer-btn" @click="options[currentType].footer?.btnFunc()">{{ options[currentType].footer?.btn }}</Button>
             </div>
         </div>
     </div>
@@ -38,6 +30,9 @@
 
 <script lang="ts" setup>
 import Button from "@/components/Button.vue";
+import { store as _store } from "@/stores/store";
+import { useRouter } from 'vue-router';
+
 import { ref } from "vue";
 
 type Type = "login" | "register";
@@ -53,6 +48,7 @@ type Footer = {
     btn: string;
     linkText: string;
     btnTypeSet: Type;
+    btnFunc: () => void
 };
 
 type Select = {
@@ -70,13 +66,13 @@ type FormOptions = {
     [key in Type]: {
         title: string;
         body: Body[];
-        footer?: Footer;
+        footer: Footer;
     };
 };
 const props = defineProps<Props>();
-
+const store = _store();
 const currentType = ref(props.type);
-
+const router = useRouter();
 const options: FormOptions = {
     login: {
         title: "Вход",
@@ -97,6 +93,10 @@ const options: FormOptions = {
             linkText: "Регистрация",
             btn: "Войти",
             btnTypeSet: "register",
+            btnFunc: () => {
+                store.login();
+                router.push('/');
+            }
         },
     },
     register: {
@@ -138,6 +138,10 @@ const options: FormOptions = {
             linkText: "Вход",
             btn: "Регистрация",
             btnTypeSet: "login",
+            btnFunc: () => {
+                store.login();
+                router.push('/');
+            }
         },
     },
 };
@@ -182,6 +186,7 @@ const setType = (event: Event, value: Type) => {
 .form-label {
     margin-bottom: 10px;
 }
+
 .form-input {
     height: 45px;
     border-radius: 10px;
@@ -197,6 +202,10 @@ const setType = (event: Event, value: Type) => {
 
 .footer-btn {
     margin-left: auto;
+}
+
+.footer-link {
+    color: black;
 }
 
 select {
