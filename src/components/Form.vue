@@ -32,7 +32,6 @@
 import Button from "@/components/Button.vue";
 import { store as _store } from "@/stores/store";
 import { useRouter } from 'vue-router';
-
 import { ref } from "vue";
 
 type Type = "login" | "register";
@@ -73,6 +72,14 @@ const props = defineProps<Props>();
 const store = _store();
 const currentType = ref(props.type);
 const router = useRouter();
+
+
+const data = {
+    login: "",
+    password: "",
+    role: "",
+};
+
 const options: FormOptions = {
     login: {
         title: "Вход",
@@ -93,9 +100,13 @@ const options: FormOptions = {
             linkText: "Регистрация",
             btn: "Войти",
             btnTypeSet: "register",
-            btnFunc: () => {
-                store.login();
-                router.push('/');
+            btnFunc: async () => {
+                const res = await store.login({
+                    email: data.login,
+                    password: data.password
+                });
+
+                if (res) router.push('/');
             }
         },
     },
@@ -123,11 +134,11 @@ const options: FormOptions = {
                     },
                     {
                         option: "Пользователь",
-                        value: "user"
+                        value: "0"
                     },
                     {
                         option: 'Создатель',
-                        value: "creator"
+                        value: "1"
                     }
                 ],
                 model: "role"
@@ -138,19 +149,23 @@ const options: FormOptions = {
             linkText: "Вход",
             btn: "Регистрация",
             btnTypeSet: "login",
-            btnFunc: () => {
-                store.login();
-                router.push('/');
+            btnFunc: async () => {
+                console.log({
+                    email: data.login,
+                    password: data.password,
+                    role: Number(data.role)
+                })
+                const res = await store.register({
+                    email: data.login,
+                    password: data.password,
+                    role: Number(data.role)
+                });
+                if (res) router.push('/');
             }
         },
     },
 };
 
-const data = {
-    login: "",
-    password: "",
-    role: "",
-};
 
 const setType = (event: Event, value: Type) => {
     event.preventDefault();

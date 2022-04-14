@@ -6,7 +6,7 @@ const store = _store();
 const router = useRouter();
 
 if (localStorage.getItem("login") == 'true') {
-    store.login();
+    store.isLogin = true;
 }
 
 </script>
