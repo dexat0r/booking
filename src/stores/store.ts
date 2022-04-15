@@ -6,7 +6,7 @@ export const store = defineStore({
     state: () => {
         return {
             isLogin: false,
-            userId: 0,
+            user: {},
         };
     },
     actions: {
@@ -14,14 +14,15 @@ export const store = defineStore({
             localStorage.setItem("login", this.isLogin.toString());
         },
         logout() {
-            this.$patch({ isLogin: false, userId: 0 });
+            this.$patch({ isLogin: false, user: {} });
             this.setLogin();
         },
         async login(data: {email: string, password: string}) {
             try {
                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, data);
-                if (res.data.ID) {
-                    this.$patch({ isLogin: true, userId: res.data.ID });
+                console.log(res)
+                if (res.data.id) {
+                    this.$patch({ isLogin: true, user: res.data });
                     this.setLogin();
                     return true;
                 } else {
@@ -35,9 +36,12 @@ export const store = defineStore({
         },
         async register(data: {email: string, password: string, role: number}) {
             try {
+                console.log(12345)
                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/register`, data);
-                if (res.data.ID) {
-                    this.$patch({ isLogin: true, userId: res.data.ID });
+                console.log(res)
+
+                if (res.data.id) {
+                    this.$patch({ isLogin: true, user: res.data });
                     this.setLogin();
                     return true;
                 } else {
@@ -49,6 +53,6 @@ export const store = defineStore({
                 return false;
             }
         }
-        async 
+        
     },
 });

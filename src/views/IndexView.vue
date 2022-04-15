@@ -37,14 +37,12 @@ import Header from "@/components/Header.vue";
 import Card from "@/components/Card.vue";
 import Filters from "@/components/Filters.vue";
 import Create from "@/components/Create.vue";
+import { reactive } from "vue";
 
 const store = _store();
 const router = useRouter();
 
-const user = {
-    id: 1,
-    role: 1,
-};
+const user = store.user;
 
 const userCards = [
     {
