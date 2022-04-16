@@ -1,41 +1,62 @@
 <template>
     <div class="card">
-        <div class="card-title title"><span class="title-text">{{ props.title }}</span></div>
-        <div class="card-row" style="height: 100%;">
-            <div class="card-col w30" style="justify-content: flex-end;">
-                <div class="card-row" style="justify-content: space-between;">
+        <div class="card-title title">
+            <span class="title-text">{{ props.title }}</span>
+        </div>
+        <div class="card-row" style="height: 100%">
+            <div class="card-col w30" style="justify-content: flex-end">
+                <div class="card-row" style="justify-content: space-between">
                     <div class="card-col">
                         <div class="text">
-                            {{ props.location.country }}
+                            {{ getLocation().country }}
                         </div>
                         <div class="text">
-                            {{ props.location.town }}
+                            {{ getLocation().town }}
                         </div>
                     </div>
                     <div class="card-col">
-                        <div class="text">Комнаты:<span style="font-weight: 600;">{{ props.rooms }}</span></div>
-                        <div class="text">Рейтинг:<span style="font-weight: 600;">{{ props.rate }}</span></div>
+                        <div class="text">
+                            Комнаты:<span style="font-weight: 600">{{
+                                props.rooms
+                            }}</span>
+                        </div>
+                        <div class="text">
+                            Услуги:<span
+                                style="font-weight: 600; sty"
+                                v-for="amen in props.amenities"
+                                >{{ `${amen.name} ` }}</span
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="card-col w70" style="padding-left:100px">
-                <div class="card-row" style="align-items: center;height: 100%;">
+            <div class="card-col w70" style="padding-left: 100px">
+                <div class="card-row" style="align-items: center; height: 100%">
                     Даты:
                     <div class="card-col card-dates">
-                        <input type="date" class="date">
-                        <input type="date" class="date">
+                        <input
+                            type="date"
+                            class="date"
+                            :min="date(Date.now())"
+                        />
+                        <input
+                            type="date"
+                            class="date"
+                            :min="date(Date.now() + 24 * 60 * 60 * 1000)"
+                        />
                     </div>
                     <Button>Забронировать</Button>
                 </div>
             </div>
         </div>
+        <div class="card-watches">{{ `Просмотров: ${watches}` }}</div>
     </div>
 </template>
 
 <style>
 .card {
     border-radius: 8px;
-    border: 0.5px solid #B9B9B9;
+    border: 0.5px solid #b9b9b9;
     height: 110px;
     width: 980px;
     padding: 16px 30px;
@@ -64,16 +85,16 @@
     flex-direction: row;
 }
 
-.card-col>div {
+.card-col > div {
     margin: 0;
 }
 
-.card-col>.text:first-child {
+.card-col > .text:first-child {
     margin-bottom: 10px;
 }
 
-.card-col>.text>span {
-    margin-left:5px;
+.card-col > .text > span {
+    margin-left: 5px;
 }
 
 .card-dates {
@@ -85,32 +106,69 @@
     margin: 0 auto;
     height: 40px;
     border-radius: 8px;
-    border: 1px solid #B9B9B9
+    border: 1px solid #b9b9b9;
 }
 
 .date:first-child {
     margin-bottom: 10px;
 }
+.card-watches {
+    right: 10px;
+    position: absolute;
+    bottom: 10px
+}
 </style>
 
 <script lang="ts" setup>
 import Button from "@/components/Button.vue";
+import { store as _store } from "@/stores/store";
 
+const store = _store();
 interface Props {
-    title: string,
+    title: string;
     location: {
-        country: string,
-        town: string
-    },
-    rooms: number,
-    rate: number
+        country: string;
+        town: string;
+    };
+    rooms: number;
+    amenities: Array<{ name: string; price: number }>;
+    watches: string;
 }
 
 const props = defineProps<Props>();
-
+const getLocation = () => {
+    return {
+        country:
+            (
+                store.filters.countryQuery.find(
+                    (el: any) => el.id == props.location.country
+                ) as any
+            )?.name || "",
+        town:
+            (
+                store.filters.cityQuery.find(
+                    (el: any) => el.id == props.location.town
+                ) as any
+            )?.name || "",
+    };
+};
 const data = {
-    date1: '',
-    date2: ''
+    date1: "",
+    date2: "",
+};
+
+function date(timestamp?: number | string) {
+    var temp = new Date(timestamp || Date.now());
+    var dateStr =
+        padStr(temp.getFullYear()) +
+        `-` +
+        padStr(1 + temp.getMonth()) +
+        `-` +
+        padStr(temp.getDate());
+    return dateStr;
 }
 
+function padStr(i: number) {
+    return i < 10 ? "0" + i : "" + i;
+}
 </script>

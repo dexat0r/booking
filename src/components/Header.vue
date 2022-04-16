@@ -6,7 +6,7 @@
         </div>
         <div class="row">
             <div class="title-wrap">
-                <router-link class="title" to="/">Booking.com</router-link>
+                <a class="title" href="/">Booking.com</a>
             </div>
             <Button v-if="store.isLogin" @click="logout()" class="logout-btn">Выйти</Button>
         </div>

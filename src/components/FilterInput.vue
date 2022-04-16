@@ -6,12 +6,13 @@
             class="filter-input"
             v-model="value"
             v-if="props.type"
+            :min="min"
         />
         <select class="filter-input" v-model="value" v-else>
         <option value="" disabled selected>---</option>
             <option
                 v-for="option in props?.options"
-                :value="option.value"
+                :value="option.value.toString()"
                 :selected="option.selected"
                 :disabled="option.disabled"
             >
@@ -62,7 +63,8 @@ interface Props {
     inputValue: string;
     label: string;
     options?: Options[];
-    type?: "text" | "date";
+    type?: "text" | "date" | "number";
+    min?: number
 }
 
 interface Options {
