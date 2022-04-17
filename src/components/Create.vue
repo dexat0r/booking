@@ -28,27 +28,66 @@
             <div class="row mb15">
                 <FilterInput
                     :input-value="data.rooms"
-                    :label="`Комнаты`"
-                    type="number"
-                    :min="1"
-                />
-                <FilterInput
-                    :input-value="data.rooms"
-                    :label="`Рейтинг`"
-                    type="text"
-                    class="mla"
+                    :label="`Регион`"
+                    :options="regionOptions"
+                    @update:input-value="
+                        (value) => {
+                            data.region = value;
+                        }
+                    "
                 />
             </div>
             <div class="row mb15">
                 <FilterInput
                     :input-value="data.rooms"
+                    :label="`Категория`"
+                    :options="categoryOptions"
+                    @update:input-value="
+                        (value) => {
+                            data.category = value;
+                        }
+                    "
+                />
+                <FilterInput
+                    :input-value="data.rooms"
+                    :label="`Комнаты`"
+                    type="number"
+                    class="mla"
+                    :min="1"
+                    @update:input-value="
+                        (value) => {
+                            data.rooms = value;
+                        }
+                    "
+                />
+            </div>
+            <div class="row mb15">
+                <FilterInput
+                    :input-value="data.amenity"
+                    :label="`Услуги`"
+                    :options="amenityOptions"
+                    :multiple="true"
+                    @update:input-value="
+                        (value) => {
+                            data.amenity = value;
+                        }
+                    "
+                />
+                <FilterInput
+                    :input-value="data.price"
                     :label="`Стоимость`"
                     type="number"
+                    class="mla"
                     :min="0"
+                    @update:input-value="
+                        (value) => {
+                            data.price = value;
+                        }
+                    "
                 />
             </div>
             <div class="row" style="justify-content: flex-end">
-                <Button>Создать</Button>
+                <Button @click="create">Создать</Button>
             </div>
         </div>
     </div>
@@ -59,6 +98,8 @@ import FilterInput from "@/components/FilterInput.vue";
 import Button from "@/components/Button.vue";
 import { computed, onBeforeMount } from "vue";
 import { store as _store } from "@/stores/store";
+import axios from 'axios';
+
 
 const store = _store();
 onBeforeMount(async () => { 
@@ -81,12 +122,50 @@ const cityOptions = computed(() =>
     })
 );
 
+const amenityOptions = computed(() => store.filters.amenitiesQuery.map((el:any) => {
+    return {
+        value: el.id,
+        label: el.name
+    }
+}))
+
+const regionOptions = computed(() => store.filters.regionQuery.map((el:any) => {
+    return {
+        value: el.id,
+        label: el.name
+    }
+}))
+
+const categoryOptions = computed(() => store.filters.categoryQuery.map((el:any) => {
+    return {
+        value: el.id,
+        label: el.name
+    }
+}))
+
 const data = {
     country: "",
     city: "",
     rooms: "",
-    rate: 0,
+    amenity: "",
+    price: "",
+    region: "",
+    category: ""
 };
+
+const create = async () => {
+    try {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/post/create`, {
+            user: store.user.id,
+            ...data
+        });
+        alert("Успешно!");
+        window.location.reload();
+        console.log(res)
+    } catch (error) {
+        console.log(error);
+    }
+}
 </script>
 
 <style>

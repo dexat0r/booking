@@ -9,18 +9,30 @@ export const store = defineStore({
             watched: false,
             current_online: 0,
             user: {
+                id: -1,
                 role: -1,
             },
             filters: {
                 countryQuery: [],
                 cityQuery: [],
                 roomQuery: [],
-                amenitiesQuery: []
+                amenitiesQuery: [],
+                regionQuery:[],
+                categoryQuery:[]
             },
-            posts: []
+            posts: [],
+            black: false,
+            isLoading: true
         };
     },
     actions: {
+        getTheme() {
+            const black = localStorage.getItem("black");
+            this.$patch({ black: black === 'true' });
+        },
+        setTheme(){
+            localStorage.setItem("black", this.black.toString());
+        },
         getLogin() {
             const login = localStorage.getItem("login");
             const user = localStorage.getItem("user");
@@ -39,15 +51,17 @@ export const store = defineStore({
             localStorage.setItem("watched", this.watched.toString());
         },
         logout() {
-            this.$patch({ isLogin: false, user: {}, watched: false });
+            window.location.reload()
+            this.$patch({ black: false })
+            this.setTheme();
+            this.$patch({ isLogin: false, user: {}, watched: false});
             this.setLogin();
         },
         async login(data: {email: string, password: string}) {
             try {
                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, data);
-                console.log(res)
                 if (res.data.id) {
-                    this.$patch({ isLogin: true, user: res.data });
+                    this.$patch({ isLogin: true, user: res.data, black: res.data.black });
                     this.setLogin();
                     return true;
                 } else {
@@ -97,7 +111,6 @@ export const store = defineStore({
         async getFilters() {
             try {
                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/filters`)
-                console.log(res)
                 if (res.data) {
                     this.$patch({ filters: res.data });
                 }
@@ -111,15 +124,24 @@ export const store = defineStore({
 
                 } else {
                     const id = (this.posts[index] as any).id;
-                    console.log(id)
+                    console.log('id', id);
                     const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/post/watch?id=${id}`);
-                    console.log(res.data);
+                    console.log('res', res);
                     (this.posts[index] as any).watches = res.data.toString();
                 }
             } catch (error) {
                 console.log(error)
             }
         },
-
+        async deletePost(id: number){
+            try {
+                console.log(id)
+                await axios.get(`${import.meta.env.VITE_API_URL}/api/post/drop?id=${id}`);
+                alert('Успешно');
+                window.location.reload();
+            } catch (error) {
+                console.log(error);
+            }
+        }
     },
 });

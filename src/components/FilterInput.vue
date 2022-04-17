@@ -8,7 +8,7 @@
             v-if="props.type"
             :min="min"
         />
-        <select class="filter-input" v-model="value" v-else>
+        <select class="filter-input" v-model="value" v-else :size="1">
         <option value="" disabled selected>---</option>
             <option
                 v-for="option in props?.options"
@@ -64,7 +64,8 @@ interface Props {
     label: string;
     options?: Options[];
     type?: "text" | "date" | "number";
-    min?: number
+    min?: number,
+    multiple?: boolean
 }
 
 interface Options {

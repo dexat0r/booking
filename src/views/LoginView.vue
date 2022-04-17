@@ -8,6 +8,11 @@
 <script lang="ts" setup>
 import Header from "@/components/Header.vue";
 import Form from "@/components/Form.vue";
+import { store as _store } from "@/stores/store";
+
+const store = _store();
+store.isLoading = false;
+
 </script>
 
 <style>
@@ -21,6 +26,6 @@ import Form from "@/components/Form.vue";
 }
 
 .login-wrap {
-    height: 100%;
+    height: 900px;
 }
 </style>

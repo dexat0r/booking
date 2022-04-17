@@ -20,12 +20,17 @@
                                 props.rooms
                             }}</span>
                         </div>
-                        <div class="text">
+                        <div class="text" style="margin-bottom: 10px">
                             Услуги:<span
                                 style="font-weight: 600; sty"
                                 v-for="amen in props.amenities"
                                 >{{ `${amen.name} ` }}</span
                             >
+                        </div>
+                        <div class="text">
+                            Цена:<span style="font-weight: 600">{{
+                                `${props.price}Р`
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -45,7 +50,8 @@
                             :min="date(Date.now() + 24 * 60 * 60 * 1000)"
                         />
                     </div>
-                    <Button>Забронировать</Button>
+                    <Button v-if="!admin">Забронировать</Button>
+                    <Button v-else @click="deletePost">Удалить</Button>
                 </div>
             </div>
         </div>
@@ -57,7 +63,7 @@
 .card {
     border-radius: 8px;
     border: 0.5px solid #b9b9b9;
-    height: 110px;
+    height: 150px;
     width: 980px;
     padding: 16px 30px;
     position: relative;
@@ -115,24 +121,28 @@
 .card-watches {
     right: 10px;
     position: absolute;
-    bottom: 10px
+    bottom: 10px;
 }
 </style>
 
 <script lang="ts" setup>
 import Button from "@/components/Button.vue";
 import { store as _store } from "@/stores/store";
+import { onMounted } from "vue";
 
 const store = _store();
 interface Props {
+    id: number;
     title: string;
     location: {
-        country: string;
-        town: string;
+        country: number;
+        town: number;
     };
     rooms: number;
     amenities: Array<{ name: string; price: number }>;
     watches: string;
+    price: number;
+    admin: boolean;
 }
 
 const props = defineProps<Props>();
@@ -171,4 +181,22 @@ function date(timestamp?: number | string) {
 function padStr(i: number) {
     return i < 10 ? "0" + i : "" + i;
 }
+
+onMounted(() => {
+    if (store.black) {
+        const titles2 = document.querySelectorAll<HTMLElement>(".title-text");
+        const selects = document.getElementsByTagName("input");
+        for (let item of titles2) {
+            item.style.color = "white";
+        }
+        for (let item of selects) {
+            item.style.background = "gray";
+            item.style.color = "white";
+        }
+    }
+});
+
+const deletePost = async () => {
+    return await store.deletePost(props.id);
+};
 </script>
