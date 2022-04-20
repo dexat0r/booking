@@ -142,8 +142,8 @@ const cityOptions = computed(() => {
                     value: el.id,
                     label: el.name,
                 });
-                return arr;
             }
+                return arr;
         }, []);
     }
 });

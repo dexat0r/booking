@@ -131,15 +131,18 @@ const cityOptions = computed(() => {
             };
         });
     } else {
-        return (store.filters.cityQuery as any).reduce((arr, el) => {
-            if (el.id_country == data.country) {
-                arr.push({
-                    value: el.id,
-                    label: el.name,
-                });
+        return (store.filters.cityQuery as any).reduce(
+            (arr, el) => {
+                if (el.id_country == data.country) {
+                    arr.push({
+                        value: el.id,
+                        label: el.name,
+                    });
+                }
                 return arr;
-            }
-        }, []);
+            },
+            []
+        );
     }
 });
 
@@ -170,7 +173,7 @@ const search = () => {
         rooms: data.rooms,
         date_start: data.date_start,
         date_end: data.date_end,
-        amenity: data.amenity
+        amenity: data.amenity,
     });
 };
 </script>
