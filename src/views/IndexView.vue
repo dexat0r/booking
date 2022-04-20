@@ -22,7 +22,8 @@
                 :watches="card.watches"
                 :price="card.price"
                 class="mb15"
-                :admin="user.role == 2"
+                :admin="user.role == 2 || user.role == 1"
+                :bookings="card.booking"
             />
         </div>
         <div class="search" v-if="isSearch">
@@ -74,6 +75,7 @@ const user = store.user;
 store.isLoading = true;
 onBeforeMount(async () => {
     await store.getPosts();
+    await store.getFilters();
     store.isLoading = false;
 });
 
@@ -98,6 +100,7 @@ onMounted(() => {
             item.style.color = "white";
         }
     }
+    console.log(cards)
 });
 
 const cards = computed(() => {
@@ -106,7 +109,9 @@ const cards = computed(() => {
         cards = store.posts.filter((el: any) => el.id_user == store.user.id);
         console.log(cards);
     }
+
     return cards.map((el: any, index) => {
+        console.log(el)
         return {
             id: el.id,
             title: el.name,
@@ -119,16 +124,19 @@ const cards = computed(() => {
             booking: el.booking,
             watches: el.watches || "1",
             price: el.price_per_night,
+            bookings: el.booking
         };
     });
 });
+
 
 interface FilterData {
     country: string;
     city: string;
     rooms: string;
-    date_from: string;
-    date_to: string;
+    date_start: string;
+    date_end: string;
+    amenity: string
 }
 
 let isSearch = ref(false);
@@ -136,31 +144,30 @@ let searchData: FilterData = {
     country: "",
     city: "",
     rooms: "",
-    date_from: "",
-    date_to: "",
+    date_start: "",
+    date_end: "",
+    amenity: ""
 };
 
 const getSearchCards = () => {
-    let searchCards = cards.value.filter((value, index, array) => {
-        const isBooked = value.booking.filter((_value) => {
-            return (
-                (_value.date_start > searchData.date_to &&
-                    _value.date_end < searchData.date_from) ||
-                (searchData.date_from > _value.date_end &&
-                    searchData.date_to < _value.date_from)
-            );
+    const d1 = new Date(searchData.date_start).getTime();
+    const d2 = new Date(searchData.date_end).getTime();
+    const day = 24 * 60 * 60 * 1000;
+    let searchCards = cards.value.filter((card) => {
+        const isBooked = card.booking.filter((booking) => {
+            const b_s = new Date(booking.date_start).getTime();
+            const b_e = new Date(booking.date_end).getTime();
+            return (!((d1 - b_e > day) || (b_s - d2 > day)));
         });
-        console.log(searchData)
-        console.log(value.location)
-        console.log(searchData.country ? searchData.country == value.location.country : true &&
-            searchData.city ? searchData.city == value.location.town : true &&
-            searchData.rooms ? searchData.rooms == value.rooms: true &&
-            !isBooked.length)
+        const hasAmenity = card.amenities.filter((amenity) => {
+            return amenity.id == Number(searchData.amenity)
+        });
+        console.log(!isBooked.length)
         return (
-            (searchData.country ? searchData.country == value.location.country : true) &&
-            (searchData.city ? searchData.city == value.location.town : true) &&
-            (searchData.rooms ? searchData.rooms == value.rooms: true) &&
-            (!isBooked.length)
+            (searchData.country ? searchData.country == card.location.country : true) &&
+            (searchData.city ? searchData.city == card.location.town : true) &&
+            (searchData.rooms ? searchData.rooms == card.rooms: true) &&
+            (!isBooked.length) && (searchData.amenity ? !!hasAmenity.length: true)
         );
     });
     return searchCards;

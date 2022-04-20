@@ -25,7 +25,7 @@
                     class="mla"
                 />
             </div>
-            <div class="row mb15">
+            <!-- <div class="row mb15">
                 <FilterInput
                     :input-value="data.rooms"
                     :label="`Регион`"
@@ -36,7 +36,7 @@
                         }
                     "
                 />
-            </div>
+            </div> -->
             <div class="row mb15">
                 <FilterInput
                     :input-value="data.rooms"
@@ -96,7 +96,7 @@
 <script lang="ts" setup>
 import FilterInput from "@/components/FilterInput.vue";
 import Button from "@/components/Button.vue";
-import { computed, onBeforeMount } from "vue";
+import { computed, onBeforeMount, reactive } from "vue";
 import { store as _store } from "@/stores/store";
 import axios from 'axios';
 
@@ -105,22 +105,48 @@ const store = _store();
 onBeforeMount(async () => { 
     await store.getFilters();
 });
-const countryOptions = computed(() =>
-    store.filters.countryQuery.map((el: any) => {
-        return {
-            value: el.id,
-            label: el.name,
-        };
-    })
-);
-const cityOptions = computed(() =>
-    store.filters.cityQuery.map((el: any) => {
-        return {
-            value: el.id,
-            label: el.name,
-        };
-    })
-);
+const countryOptions = computed(() => {
+    if (!data.city) {
+        return store.filters.countryQuery.map((el: any) => {
+            return {
+                value: el.id,
+                label: el.name,
+            };
+        });
+    } else {
+
+        const city = store.filters.cityQuery.find((el:any) => el.id == data.city);
+        const country =  (store.filters.countryQuery as any).find((el: any) => el.id == (city as any).id_country);
+        console.log(country)
+        return [
+            {
+                value: country.id,
+                label: country.name,
+            }
+        ]
+    }
+});
+
+const cityOptions = computed(() => {
+    if (!data.country) {
+        return store.filters.cityQuery.map((el: any) => {
+            return {
+                value: el.id,
+                label: el.name,
+            };
+        });
+    } else {
+        return (store.filters.cityQuery as any).reduce((arr, el) => {
+            if (el.id_country == data.country) {
+                arr.push( {
+                    value: el.id,
+                    label: el.name,
+                });
+                return arr;
+            }
+        }, []);
+    }
+});
 
 const amenityOptions = computed(() => store.filters.amenitiesQuery.map((el:any) => {
     return {
@@ -143,7 +169,7 @@ const categoryOptions = computed(() => store.filters.categoryQuery.map((el:any) 
     }
 }))
 
-const data = {
+const data = reactive({
     country: "",
     city: "",
     rooms: "",
@@ -151,7 +177,7 @@ const data = {
     price: "",
     region: "",
     category: ""
-};
+});
 
 const create = async () => {
     try {

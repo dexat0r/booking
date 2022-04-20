@@ -12,11 +12,11 @@
         <option value="" disabled selected>---</option>
             <option
                 v-for="option in props?.options"
-                :value="option.value.toString()"
-                :selected="option.selected"
-                :disabled="option.disabled"
+                :value="option?.value.toString()"
+                :selected="option?.selected"
+                :disabled="option?.disabled"
             >
-                {{ option.label }}
+                {{ option?.label }}
             </option>
         </select>
     </div>

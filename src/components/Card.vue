@@ -22,7 +22,7 @@
                         </div>
                         <div class="text" style="margin-bottom: 10px">
                             Услуги:<span
-                                style="font-weight: 600; sty"
+                                style="font-weight: 600"
                                 v-for="amen in props.amenities"
                                 >{{ `${amen.name} ` }}</span
                             >
@@ -36,21 +36,30 @@
                 </div>
             </div>
             <div class="card-col w70" style="padding-left: 100px">
-                <div class="card-row" style="align-items: center; height: 100%">
-                    Даты:
-                    <div class="card-col card-dates">
+                <div
+                    class="card-row"
+                    style="
+                        align-items: center;
+                        height: 100%;
+                        justify-content: flex-end;
+                    "
+                >
+                    <span v-if="!props.admin">Даты:</span>
+                    <div class="card-col card-dates" v-if="!props.admin">
                         <input
                             type="date"
                             class="date"
                             :min="date(Date.now())"
+                            v-model="data.date1"
                         />
                         <input
                             type="date"
                             class="date"
                             :min="date(Date.now() + 24 * 60 * 60 * 1000)"
+                            v-model="data.date2"
                         />
                     </div>
-                    <Button v-if="!admin">Забронировать</Button>
+                    <Button v-if="!admin" @click="book">Забронировать</Button>
                     <Button v-else @click="deletePost">Удалить</Button>
                 </div>
             </div>
@@ -64,7 +73,7 @@
     border-radius: 8px;
     border: 0.5px solid #b9b9b9;
     height: 150px;
-    width: 980px;
+    width: 1150px;
     padding: 16px 30px;
     position: relative;
 }
@@ -143,6 +152,7 @@ interface Props {
     watches: string;
     price: number;
     admin: boolean;
+    bookings?: { date_end: string; date_start: string }[];
 }
 
 const props = defineProps<Props>();
@@ -150,9 +160,9 @@ const getLocation = () => {
     return {
         country:
             (
-                store.filters.countryQuery.find(
-                    (el: any) => el.id == props.location.country
-                ) as any
+                store.filters.countryQuery.find((el: any) => {
+                    return el.id == props.location.country;
+                }) as any
             )?.name || "",
         town:
             (
@@ -162,6 +172,7 @@ const getLocation = () => {
             )?.name || "",
     };
 };
+
 const data = {
     date1: "",
     date2: "",
@@ -198,5 +209,50 @@ onMounted(() => {
 
 const deletePost = async () => {
     return await store.deletePost(props.id);
+};
+
+const checkIfBooked = () => {
+    const d1 = new Date(data.date1).getTime();
+    const d2 = new Date(data.date2).getTime();
+    const day = 24 * 60 * 60 * 1000;
+    if (props.bookings) {
+        for(let i = 0; i < props.bookings.length; i++) {
+            const b_s = new Date(props.bookings[i].date_start).getTime();
+            const b_e = new Date(props.bookings[i].date_end).getTime();
+            if (
+                !((d1 - b_e > day) || (b_s - d2 > day))
+            ) {
+                return true;
+            }
+        }
+    } else {
+        return false;
+    }
+};
+
+const book = async () => {
+    const d1 = new Date(data.date1);
+    const d2 = new Date(data.date2);
+    if (!data.date1 || !data.date2) {
+        alert("Нет дат!");
+        return;
+    }
+    if (d2 <= d1) {
+        alert("Неправильные даты!");
+        return;
+    }
+    if (checkIfBooked()) {
+        alert("На эти даты место забронировано!")
+        return;
+    }
+    try {
+        const res = await store.book({
+            date_from: data.date1,
+            date_to: data.date2,
+            property: props.id
+        })
+    } catch (error) {
+        console.log(error);
+    }
 };
 </script>

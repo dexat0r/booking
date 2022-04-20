@@ -135,12 +135,23 @@ export const store = defineStore({
         },
         async deletePost(id: number){
             try {
-                console.log(id)
                 await axios.get(`${import.meta.env.VITE_API_URL}/api/post/drop?id=${id}`);
                 alert('Успешно');
                 window.location.reload();
             } catch (error) {
                 console.log(error);
+            }
+        },
+        async book(data: {date_from: string, date_to: string, property: number}) {
+            try {
+                const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/book`, {
+                    user: this.user.id,
+                    ...data
+                });
+                console.log(res);
+                alert(`Успешно! Стоимость бронирования ${res.data}Р`);
+            } catch (error) {
+                console.log(error)
             }
         }
     },
